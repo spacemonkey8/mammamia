@@ -1,24 +1,43 @@
-import logo from './logo.svg';
-import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Context from "./context/context";
+import { useState, useEffect } from "react";
+import HeaderInfo from './components/Navbar';
+import Home from "./views/Home";
+import Carrito from './views/Carrito';
+import PizzaInfo from './views/PizzaInfo';
 
 function App() {
+
+  const endpoint = "/pizzas.json";
+  const [ pizzasInfo, setPizzasInfo ] = useState([]);
+  const getPizzas = () => {
+    fetch(endpoint).then(resp => resp.json())
+      .then(data => (
+        setPizzasInfo(data)
+      ));
+  };
+
+  useEffect(() => {
+    getPizzas();
+  }, []);
+
+  const estado = { pizzasInfo }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Context.Provider value={estado}>
+        <BrowserRouter>
+          <HeaderInfo />
+            <Routes>
+              <Route path='/' element={<Home />} />
+              <Route path='/carrito' element={<Carrito />} />
+              <Route path='/pizza/:id' element={<PizzaInfo />} />
+            </Routes>
+
+        </BrowserRouter>
+      </Context.Provider>
+    </>
   );
 }
 
